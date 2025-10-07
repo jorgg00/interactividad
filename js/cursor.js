@@ -1,4 +1,9 @@
 const FRICTION= 0.1; //mientras más pegado a 1 más rápido, mientras más pegado a 0 más lento
+const RADIO= 50;
+const STROKE_WEIGHT= 10;
+const FILL_COLOR= "rgba(14, 24, 172, 0.1)";
+const BG_COLOR= "rgba(251, 251, 251, 0.1)";
+const STROKE_COLOR= "rgba(114, 20, 20, 0.1)";
 let pos= null;
 
 function setup() {
@@ -16,6 +21,9 @@ function update() {
 
 function draw() {
     update();
-    background(255);
-    ellipse(pos.x, pos.y, 100, 100);
+    background(BG_COLOR);
+    ellipse(pos.x, pos.y, RADIO, RADIO);
+    fill(FILL_COLOR);
+    stroke(STROKE_COLOR);
+    strokeWeight(STROKE_WEIGHT);
 }   
