@@ -1,21 +1,28 @@
 
-const input = document.getElementById('wght-slider');
+const inputWght = document.getElementById('wght-slider');
 const inputSlant = document.getElementById('slnt-slider');
 const title = document.querySelector('h1');
 
 
+function updateFontStyles(){
+const wght = inputWght.value;
+const slant = inputSlant.value;
+title.style.fontWeight = wght;
+title.style.fontVariationSettings = "'slnt' " +slant + ", 'ELSH' " + elsh
+title.style.opacity = opacity;
 
-input.addEventListener('input', function() {
-    const weigth = input.value;
-    console.log(weigth);
-    title.style.fontWeight = weigth
+}
 
+inputWght.addEventListener('input', updateFontStyles);
+inputSlant.addEventListener('input', updateFontStyles);
+window.addEventListener('mousemove', function(event){
+ console.log(event);
+    const mouseX = event.clientX;
+    const mouseY = event.clientY;
+    opacity = 1- (mouseX / window.innerWidth);
+    elsh = (mouseY / window.innerHeight)*100;
+  updateFontStyles();
+
+    
 });
 
-
-inputSlant.addEventListener('input', function() {
-    const slant = inputSlant.value;
-    console.log(slant);
-    title.style.fontVariationSettings = "'slnt' " +slant;
-
-});
