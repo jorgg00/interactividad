@@ -52,6 +52,20 @@ function draw(){
     const blue = 255-int(vol*255);
     fill(red, green, blue);
     text("OH, WHAT A RUSH", windowWidth/2, fontSize*3);
+    
+    const spectrum = fft.analyze();
+    const invertedSpectrum = spectrum.slice().reverse();
+    const values = invertedSpectrum.concat(spectrum);
+    beginShape();
+    curveVertex(0,height/2);
+    for(let i = 0; i < values.length; i++){
+        const x = map(i, 0, values.length,0,width);
+        let yOffset = map(values[i],0,255,0,height/4);
+        if(i % 2 == 0) yOffset *= -1;
+        curveVertex(x,yOffset + height / 2);
+    }
+curveVertex(width,height / 2);
+endShape();
 
    
 
