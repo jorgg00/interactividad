@@ -1,20 +1,30 @@
 
 let font,fontSize;
-let song;
-
+let song,fft, smoothing = 0.9, binSize = 128;
+let amplitude = 0;
 function preload() {
     font = loadFont("../css/rubik.ttf");
     song = loadSound("../audio/crush.mp3")
+
 }
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
+    let canvas = createCanvas(windowWidth,windowHeight);
     textFont(font);
     textSize(100);
     textAlign(CENTER, CENTER);
     windowResized();
-   
-    
+    amplitude = new p5.Amplitude();
+    canvas.mousePressed(() => {
+        if (song.isPlaying()) {
+            song.pause();
+        } else {
+            song.play();
+        }
+    });
+
+    fft = new p5.FFT(smoothing, binSize);
+    fft.setInput(song);
    
 }
 
@@ -25,12 +35,25 @@ function windowResized(){
 }
 
 function draw(){
-    background("#F2D544");
-    text("I GOT A CRUSH", windowWidth/2, windowHeight/2);
-    text("CAN'T GET ENOUGH", windowWidth/2, windowHeight/2+fontSize*1);
-    text("YOU TOLD ME HUSH", windowWidth/2, windowHeight/2+fontSize*2);
-    text("OH, WHAT A RUSH", windowWidth/2, windowHeight/2+fontSize*3);
+   // let spectrum = fft.analyze();
+    let vol = amplitude.getLevel();
+    console.log(vol);
 
+    background(int(vol*255));
+    translate(0, windowHeight/2 - (fontSize*2));
+    fill(255 - int(vol*255));
+    text("I GOT A CRUSH", windowWidth/2, 0);
+    fill(255 - int(vol*255));
+    text("CAN'T GET ENOUGH", windowWidth/2, fontSize*1);
+    fill(255 - int(vol*255));
+    text("YOU TOLD ME HUSH", windowWidth/2, fontSize*2);
+    const red = 255 - int(vol*255);
+    const green = 0;
+    const blue = 255-int(vol*255);
+    fill(red, green, blue);
+    text("OH, WHAT A RUSH", windowWidth/2, fontSize*3);
+
+   
 
 }
 
