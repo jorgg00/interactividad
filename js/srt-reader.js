@@ -32,7 +32,7 @@ export default class SRTLector {
             this.isLoaded = true;
             
             // Configurar eventos del medio
-           // this.setupMediaEvents();
+           this.setupMediaEvents();
             
             console.log(`SRT cargado: ${this.srt.lines.length} subtítulos`);
         } catch (error) {
@@ -44,30 +44,44 @@ export default class SRTLector {
      * Configura los eventos del elemento de media (video/audio)
      */
     setupMediaEvents() {
-        // Escuchar cambios de tiempo durante la reproducción
-        this.mediaElement.addEventListener('timeupdate', () => {
-            this.updateSubtitle();
-        });
+		const hasAddEventListener = this.mediaElement && typeof this.mediaElement.addEventListener === 'function';
 
-        // Escuchar cuando el usuario hace seeking (arrastra la barra de progreso)
-        this.mediaElement.addEventListener('seeked', () => {
-            this.updateSubtitle();
-        });
+		if (hasAddEventListener) {
+			// Elemento HTMLMediaElement (audio/video)
+			this.mediaElement.addEventListener('timeupdate', () => {
+				this.updateSubtitle();
+			});
 
-        // Actualizar cuando se pausa
-        this.mediaElement.addEventListener('pause', () => {
-            this.updateSubtitle();
-        });
+			this.mediaElement.addEventListener('seeked', () => {
+				this.updateSubtitle();
+			});
 
-        // Actualizar cuando se reproduce
-        this.mediaElement.addEventListener('play', () => {
-            this.updateSubtitle();
-        });
+			this.mediaElement.addEventListener('pause', () => {
+				this.updateSubtitle();
+			});
 
-        // Limpiar subtítulo cuando termina
-        this.mediaElement.addEventListener('ended', () => {
-            this.clearSubtitle();
-        });
+			this.mediaElement.addEventListener('play', () => {
+				this.updateSubtitle();
+			});
+
+			this.mediaElement.addEventListener('ended', () => {
+				this.clearSubtitle();
+			});
+		} else {
+			// Caso genérico (por ejemplo p5.SoundFile) sin addEventListener: usar sondeo
+			if (!this.updateInterval) {
+				this.updateInterval = setInterval(() => {
+					this.updateSubtitle();
+				}, this.options.updateInterval);
+			}
+
+			// Enganchar fin de reproducción si la API lo soporta (p5.SoundFile.onended)
+			if (this.mediaElement && typeof this.mediaElement.onended === 'function') {
+				this.mediaElement.onended(() => {
+					this.clearSubtitle();
+				});
+			}
+		}
     }
 
     /**
@@ -78,7 +92,7 @@ export default class SRTLector {
             return;
         }
 
-        const currentTime = this.mediaElement.currentTime;
+		const currentTime = this.getCurrentTime();
         const subtitle = this.srt.getSubtitleAtTime(currentTime);
 
         // Solo actualizar si el subtítulo cambió
@@ -120,7 +134,7 @@ export default class SRTLector {
         if (this.currentSubtitle) {
             this.currentSubtitle = null;
             if (this.options.onSubtitleChange) {
-                this.options.onSubtitleChange(null, this.mediaElement.currentTime);
+				this.options.onSubtitleChange(null, this.getCurrentTime());
             }
         }
     }
@@ -132,6 +146,40 @@ export default class SRTLector {
     getCurrentSubtitle() {
         return this.currentSubtitle;
     }
+
+	/**
+	 * Obtiene el tiempo actual del medio soportando distintas APIs
+	 * @returns {number}
+	 */
+	getCurrentTime() {
+		const me = this.mediaElement;
+		if (!me) return 0;
+
+		// HTMLMediaElement: number
+		if (typeof me.currentTime === 'number') {
+			return me.currentTime;
+		}
+
+		// p5.SoundFile: function currentTime()
+		if (typeof me.currentTime === 'function') {
+			try {
+				return me.currentTime();
+			} catch (_) {
+				return 0;
+			}
+		}
+
+		// Otras APIs posibles
+		if (typeof me.getCurrentTime === 'function') {
+			try {
+				return me.getCurrentTime();
+			} catch (_) {
+				return 0;
+			}
+		}
+
+		return 0;
+	}
 
     /**
      * Obtiene el subtítulo para un tiempo específico
