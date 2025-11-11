@@ -1,15 +1,35 @@
+import SRTLector from './srt-reader.js'
 
 let font,fontSize;
 let song,fft, smoothing = 0.9, binSize = 128;
 let amplitude = 0;
-function preload() {
+let audioSRTReader;
+
+window.preload= () => {
+    
     font = loadFont("../css/rubik.ttf");
     song = loadSound("../audio/crush.mp3")
+ console.log(song);
+ audioSRTReader = new SRTLector(
+    song,
+    '/subtitles.srt',
+    {
+      onSubtitleChange: (subtitle, currentTime) => {
+        // Solo actualizar si el audio está reproduciéndose
+        if (song.isPlaying()) {
+         console.log(subtitle, currentTime)
+        }
+        console.log("update");
+      }
+    }
+  )
 
 }
 
-function setup() {
+window.setup= () => {
+
     let canvas = createCanvas(windowWidth,windowHeight);
+  
     textFont(font);
     textSize(100);
     textAlign(CENTER, CENTER);
@@ -28,16 +48,18 @@ function setup() {
    
 }
 
-function windowResized(){
+window.windowResized = () => {
+
     fontSize = windowWidth/11;
     resizeCanvas(windowWidth, windowHeight);
     textSize(fontSize);
 }
 
-function draw(){
+window.draw= () =>{
+
    // let spectrum = fft.analyze();
     let vol = amplitude.getLevel();
-    console.log(vol);
+   // console.log(vol);
 
     background(int(vol*255));
     translate(0, windowHeight/2 - (fontSize*2));
