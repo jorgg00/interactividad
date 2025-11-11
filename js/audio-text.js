@@ -81,12 +81,14 @@ window.draw = () => {
     beginShape();
     for (var i = 0; i < 200; i++) {
       var ang = map(i, 10, 100, 0, TWO_PI);
-      var rad = (vol*(abs(sin(i)*200)+80))*(5) * noise(i * 0.03, frameCount * 0.004);
+      var rad = (vol*(abs(sin(i)*200)+80))*(8) * noise(i * 0.03, frameCount * 0.006);
       var x = rad * cos(ang);
       var y = rad * sin(ang);
       curveVertex(x, y);
     }
     endShape();
+
+    
   
    
     
