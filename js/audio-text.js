@@ -4,10 +4,10 @@ let font, fontSize;
 let song, fft, smoothing = 0.9, binSize = 128;
 let amplitude = 0;
 let audioSRTReader;
-let currentsubtitle;
+let currentsubtitle = "";
 let center= {x:1, y:1}
 let diameter = 100;
-
+let vol = 0;
 var t;
 
 window.preload = () => {
@@ -19,9 +19,11 @@ window.preload = () => {
         onSubtitleChange: (obj, currentTime) => {
             // Solo actualizar si el audio está reproduciéndose
             if (song.isPlaying()) {
-                console.log(obj.subtitle, currentTime)
+                currentsubtitle = obj.subtitle
+
+             
             }
-            console.log("update");
+            
         }
     })
 }
@@ -57,29 +59,21 @@ window.windowResized = () => {
     diameter= max(windowWidth,windowHeight);
    center= {x:width/2, y:height/2}
 }
+window.drawText =() =>{
+    noStroke();
+    fill(255 - int(vol * 255));
+    text(String(currentsubtitle).toUpperCase(),center.x,center.y);
+}
 
 window.draw = () => {
 
     // let spectrum = fft.analyze();
-    let vol = amplitude.getLevel();
+   vol = amplitude.getLevel();
     // console.log(vol);
-    currentsubtitle = 
-
 
     background(int(vol * 255), 20);
-    noStroke();
-    fill(255 - int(vol * 255));
-    text("I GOT A CRUSH", center.x, center.y - (fontSize * 2));
-    fill(255 - int(vol * 255));
-    text("CAN'T GET ENOUGH", center.x, center.y - fontSize);
-    fill(255 - int(vol * 255));
-    text("YOU TOLD ME HUSH", center.x, center.y + fontSize);
-    const red = 255 - int(vol * 255);
-    const green = 0;
-    const blue = 255 - int(vol * 255);
-    fill(255 - int(vol * 255));
-    text("OH, WHAT A RUSH", center.x, center.y + fontSize * 2);
-
+    drawText();
+    
     stroke(255,0,0);
     noFill();
     
@@ -95,15 +89,7 @@ window.draw = () => {
     endShape();
   
    
-    beginShape();
-    for (var i = 0; i < 200; i++) {
-      var ang = map(i, 10, 100, 0, TWO_PI);
-      var rad = (vol*(abs(sin(i)*200)+80))*(5) * noise(i * 0.03, frameCount * 0.004);
-      var x = rad * cos(ang);
-      var y = rad * sin(ang);
-      curveVertex(x, y);
-    }
-    endShape();
+    
 
 
 }
