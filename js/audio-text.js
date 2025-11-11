@@ -4,6 +4,11 @@ let font, fontSize;
 let song, fft, smoothing = 0.9, binSize = 128;
 let amplitude = 0;
 let audioSRTReader;
+let currentsubtitle;
+let center= {x:1, y:1}
+let diameter = 100;
+
+var t;
 
 window.preload = () => {
 
@@ -25,8 +30,9 @@ window.setup = () => {
 
     let canvas = createCanvas(windowWidth, windowHeight);
 
+    diameter= max(width,height);
+
     textFont(font);
-    textSize(100);
     textAlign(CENTER, CENTER);
     windowResized();
     amplitude = new p5.Amplitude();
@@ -48,6 +54,8 @@ window.windowResized = () => {
     fontSize = windowWidth / 11;
     resizeCanvas(windowWidth, windowHeight);
     textSize(fontSize);
+    diameter= max(windowWidth,windowHeight);
+   center= {x:width/2, y:height/2}
 }
 
 window.draw = () => {
@@ -55,35 +63,47 @@ window.draw = () => {
     // let spectrum = fft.analyze();
     let vol = amplitude.getLevel();
     // console.log(vol);
+    currentsubtitle = 
 
-    background(int(vol * 255));
-    translate(0, windowHeight / 2 - (fontSize * 2));
+
+    background(int(vol * 255), 20);
+    noStroke();
     fill(255 - int(vol * 255));
-    text("I GOT A CRUSH", windowWidth / 2, 0);
+    text("I GOT A CRUSH", center.x, center.y - (fontSize * 2));
     fill(255 - int(vol * 255));
-    text("CAN'T GET ENOUGH", windowWidth / 2, fontSize * 1);
+    text("CAN'T GET ENOUGH", center.x, center.y - fontSize);
     fill(255 - int(vol * 255));
-    text("YOU TOLD ME HUSH", windowWidth / 2, fontSize * 2);
+    text("YOU TOLD ME HUSH", center.x, center.y + fontSize);
     const red = 255 - int(vol * 255);
     const green = 0;
     const blue = 255 - int(vol * 255);
-    fill(red, green, blue);
-    text("OH, WHAT A RUSH", windowWidth / 2, fontSize * 3);
+    fill(255 - int(vol * 255));
+    text("OH, WHAT A RUSH", center.x, center.y + fontSize * 2);
 
-    const spectrum = fft.analyze();
-    const invertedSpectrum = spectrum.slice().reverse();
-    const values = invertedSpectrum.concat(spectrum);
+    stroke(255,0,0);
+    noFill();
+    
+    translate(center.x, center.y);
     beginShape();
-    curveVertex(0, height / 2);
-    for (let i = 0; i < values.length; i++) {
-        const x = map(i, 0, values.length, 0, width);
-        let yOffset = map(values[i], 0, 255, 0, height / 4);
-        if (i % 2 == 0) yOffset *= -1;
-        curveVertex(x, yOffset + height / 2);
+    for (var i = 0; i < 200; i++) {
+      var ang = map(i, 10, 100, 0, TWO_PI);
+      var rad = (vol*(abs(sin(i)*200)+80))*(5) * noise(i * 0.03, frameCount * 0.004);
+      var x = rad * cos(ang);
+      var y = rad * sin(ang);
+      curveVertex(x, y);
     }
-    curveVertex(width, height / 2);
     endShape();
-
+  
+   
+    beginShape();
+    for (var i = 0; i < 200; i++) {
+      var ang = map(i, 10, 100, 0, TWO_PI);
+      var rad = (vol*(abs(sin(i)*200)+80))*(5) * noise(i * 0.03, frameCount * 0.004);
+      var x = rad * cos(ang);
+      var y = rad * sin(ang);
+      curveVertex(x, y);
+    }
+    endShape();
 
 
 }
