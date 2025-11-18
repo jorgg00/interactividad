@@ -18,8 +18,9 @@ window.preload = () => {
     audioSRTReader = new SRTLector(song, '/subtitles.srt', {
         onSubtitleChange: (obj, currentTime) => {
             // Solo actualizar si el audio está reproduciéndose
-            if (song.isPlaying()) {
-                currentsubtitle = obj.subtitle.toUpperCase()
+            if (song.isPlaying() && obj) {
+                currentsubtitle = String(obj.subtitle).toUpperCase()
+
             }
             
         }
@@ -28,7 +29,7 @@ window.preload = () => {
 
 window.setup = () => {
 
-    let canvas = createCanvas(windowWidth, windowHeight);
+    let canvas = createCanvas(windowWidth, windowHeight,WEBGL);
 
     diameter= max(width,height);
 
@@ -40,6 +41,7 @@ window.setup = () => {
         if (song.isPlaying()) {
             song.pause();
         } else {
+            
             song.play();
         }
     });
@@ -57,22 +59,23 @@ window.windowResized = () => {
     diameter= max(windowWidth,windowHeight);
    center= {x:width/2, y:height/2}
 }
-
 window.drawText = () =>{
+    push();
+    resetMatrix();
+    translate(0, 0, 81);
     noStroke();
     fill(255 - int(vol * 255));
     textWrap(WORD);
-    const horizontalPadding = width * 0.1;
-    const textBoxWidth = width - horizontalPadding * 2;
-    const textBoxHeight = height * 0.6;
-    const textBoxY = center.y - textBoxHeight / 2;
+    const textBoxWidth = width * 0.8;
+    const textBoxHeight = height * 0.8;
     text(
         currentsubtitle,
-        horizontalPadding,
-        textBoxY,
+        -center.x + (width * .1),
+        -center.y + (height *.1),
         textBoxWidth,
         textBoxHeight
     );
+    pop();
 }
 
 window.draw = () => {
@@ -81,13 +84,22 @@ window.draw = () => {
    vol = amplitude.getLevel();
     // console.log(vol);
 
-    background(int(vol * 255), 30);
+    background(int(vol * 255));
+
     drawText();
     
     stroke(255,0,0);
     noFill();
-    
-    translate(center.x, center.y);
+    stroke(0,0,255);
+   
+    push();
+    translate(0, 0, -1);
+    rotateY(vol * 0.2);
+    sphere(80);            // esfera girando
+    pop();
+
+    push();
+    translate(0, 0, 0);
     beginShape();
     for (var i = 0; i < 200; i++) {
       var ang = map(i, 10, 100, 0, TWO_PI);
@@ -97,8 +109,10 @@ window.draw = () => {
       curveVertex(x, y);
     }
     endShape();
+    pop();
 
-  
+    
+    
    
     
 
