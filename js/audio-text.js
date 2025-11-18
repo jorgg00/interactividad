@@ -19,9 +19,7 @@ window.preload = () => {
         onSubtitleChange: (obj, currentTime) => {
             // Solo actualizar si el audio está reproduciéndose
             if (song.isPlaying()) {
-                currentsubtitle = obj.subtitle
-
-             
+                currentsubtitle = obj.subtitle.toUpperCase()
             }
             
         }
@@ -59,10 +57,22 @@ window.windowResized = () => {
     diameter= max(windowWidth,windowHeight);
    center= {x:width/2, y:height/2}
 }
-window.drawText =() =>{
+
+window.drawText = () =>{
     noStroke();
     fill(255 - int(vol * 255));
-    text(String(currentsubtitle).toUpperCase(),center.x,center.y);
+    textWrap(WORD);
+    const horizontalPadding = width * 0.1;
+    const textBoxWidth = width - horizontalPadding * 2;
+    const textBoxHeight = height * 0.6;
+    const textBoxY = center.y - textBoxHeight / 2;
+    text(
+        currentsubtitle,
+        horizontalPadding,
+        textBoxY,
+        textBoxWidth,
+        textBoxHeight
+    );
 }
 
 window.draw = () => {
@@ -88,20 +98,6 @@ window.draw = () => {
     }
     endShape();
 
-    stroke(255,0,0);
-    noFill();
-
-    translate(center.x+1, center.y+1);
-    beginShape();
-    for (var i = 0; i < 200; i++) {
-      var ang = map(i, 10, 100, 0, TWO_PI);
-      var rad = 200 * noise(i * 0.01, frameCount * 0.005);
-      var x = rad * cos(ang);
-      var y = rad * sin(ang);
-      curveVertex(x, y);
-    }
-    endShape();
-    
   
    
     
