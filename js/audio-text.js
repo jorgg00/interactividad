@@ -59,6 +59,7 @@ window.windowResized = () => {
     diameter= max(windowWidth,windowHeight);
    center= {x:width/2, y:height/2}
 }
+
 window.drawText = () =>{
     push();
     resetMatrix();
@@ -78,6 +79,30 @@ window.drawText = () =>{
     pop();
 }
 
+function drawsphere(diameter=10){
+    push();
+    translate(0, 0, -1);
+    rotateY(vol * 0.2);
+    sphere(diameter);            // esfera girando
+    pop();
+
+}
+
+function drawlines(novertex=100){
+    push();
+    translate(0, 0, 0);
+    beginShape();
+    for (var i = 0; i < novertex; i++) {
+      var ang = map(i, 10, 100, 0, TWO_PI);
+      var rad = (vol*(abs(sin(i)*200)+80))*(8) * noise(i * 0.03, frameCount * 0.006);
+      var x = rad * cos(ang);
+      var y = rad * sin(ang);
+      curveVertex(x, y);
+    }
+    endShape();
+    pop();
+}
+
 window.draw = () => {
 
     // let spectrum = fft.analyze();
@@ -92,30 +117,9 @@ window.draw = () => {
     noFill();
     stroke(0,0,255);
    
-    push();
-    translate(0, 0, -1);
-    rotateY(vol * 0.2);
-    sphere(80);            // esfera girando
-    pop();
-
-    push();
-    translate(0, 0, 0);
-    beginShape();
-    for (var i = 0; i < 200; i++) {
-      var ang = map(i, 10, 100, 0, TWO_PI);
-      var rad = (vol*(abs(sin(i)*200)+80))*(8) * noise(i * 0.03, frameCount * 0.006);
-      var x = rad * cos(ang);
-      var y = rad * sin(ang);
-      curveVertex(x, y);
-    }
-    endShape();
-    pop();
-
     
-    
-   
-    
-
+    drawsphere(80 * vol);
+    drawlines(80);
 
 }
 
